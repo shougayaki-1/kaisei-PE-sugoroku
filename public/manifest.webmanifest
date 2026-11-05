@@ -1,0 +1,10 @@
+{
+  "name": "KAiSEi PE SUGOROKU",
+  "short_name": "PE SUGOROKU",
+  "description": "お題の順位でコマが進む体育すごろく",
+  "lang": "ja",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101c2c",
+  "theme_color": "#101c2c"
+}

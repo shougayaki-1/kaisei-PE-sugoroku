@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+
+let displayWindowRef: Window | null = null;
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Check, ChevronDown, Eye, Flag, ListChecks, Maximize2, Monitor, MonitorUp, Plus, Redo2, RotateCcw, Shuffle, Trophy, Undo2 } from 'lucide-react';
 import type { Game } from '../types';
 import { activeTeams, adjustPosition, commitResults, finishGame, nextRound, revealChallenge, selectChallenge, sortedStandings, unusedChallenges } from '../engine';
@@ -12,7 +14,7 @@ export function PlayScreen({ game, onEdit }: Props) {
   const redo = useGameStore((s) => s.redoGame);
   const undoCount = useGameStore((s) => s.undo[game.id]?.length ?? 0);
   const redoCount = useGameStore((s) => s.redo[game.id]?.length ?? 0);
-  const [mode, setMode] = useState<'single' | 'dual'>('single');
+  const [mode, setMode] = useState<'single' | 'dual'>(displayWindowRef && !displayWindowRef.closed ? 'dual' : 'single');
   const [focus, setFocus] = useState(false);
   const [order, setOrder] = useState<string[]>([]);
   const [positions, setPositions] = useState<Record<string, string>>({});
@@ -39,7 +41,7 @@ export function PlayScreen({ game, onEdit }: Props) {
     const url = window.location.origin + window.location.pathname + '?display=' + encodeURIComponent(game.id);
     const windowRef = window.open(url, 'kaisei-display-' + game.id);
     if (!windowRef) alert('表示画面を開けませんでした。ブラウザのポップアップ設定を確認してください。');
-    else { windowRef.focus(); setMode('dual'); setFocus(false); }
+    else { displayWindowRef = windowRef; windowRef.focus(); setMode('dual'); setFocus(false); }
   };
   const manualFinish = () => {
     if (confirm('ゲームを終了しますか？ 最終結果を表示します。')) action(finishGame, true);
@@ -64,7 +66,7 @@ export function PlayScreen({ game, onEdit }: Props) {
     <div className="mode-bar">
       <span className={'mode-indicator ' + (mode === 'dual' ? 'mode-dual' : '')}><span className="live-dot"/>{mode === 'dual' ? '2画面モード：表示画面を別ウィンドウで開いています' : '1画面モード：運営と表示が同じ画面です'}</span>
       <div className="mode-actions">
-        <button className="text-button" onClick={() => { setMode('single'); setFocus(false); }}><Monitor size={15}/>1画面</button>
+        <button className="text-button" onClick={() => { displayWindowRef?.close(); displayWindowRef = null; setMode('single'); setFocus(false); }}><Monitor size={15}/>1画面</button>
         <button className="text-button" onClick={openDisplay}><MonitorUp size={15}/>2画面</button>
         <button className="text-button" onClick={() => setFocus(!focus)}><Maximize2 size={15}/>{focus ? '操作に戻る' : '発表表示'}</button>
       </div>

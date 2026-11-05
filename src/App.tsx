@@ -110,7 +110,7 @@ function AppShell() {
           </article>)}</div> : <div className="empty-games"><FolderOpen size={43}/><h3>まだゲームがありません</h3><p>新しいゲームを作成するか、サンプルで操作を試してください。</p><button className="btn btn-primary" onClick={() => create(false)}><Plus size={17}/>新しいゲームを作る</button></div>}
           <div className="home-info-grid"><div className="info-panel"><MonitorUp size={22}/><strong>1画面・2画面に対応</strong><p>PCだけでも、プロジェクターにつないでも進行できます。</p></div><div className="info-panel"><ListChecks size={22}/><strong>お題を自由にカスタマイズ</strong><p>途中追加・ランダム出題・順位別の移動量に対応。</p></div><div className="info-panel"><CircleHelp size={22}/><strong>操作ミスにも対応</strong><p>結果の取り消しや、JSONバックアップが利用できます。</p></div></div>
         </div>}
-        {route === 'settings' && game && <SettingsScreen game={game} onPlay={() => navigate(game.status === 'setup' ? 'home' : 'play')}/>}
+        {route === 'settings' && game && <SettingsScreen game={game} onPlay={() => navigate('play')}/>}
         {route === 'play' && game && (game.status === 'setup' ? <SettingsScreen game={game} onPlay={() => navigate('home')}/> : <PlayScreen game={game} onEdit={() => navigate('settings')}/>)}
       </div>
     </div>

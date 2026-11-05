@@ -31,7 +31,7 @@ describe('すごろくの進行', () => {
   });
   it('全員ゴール方式ではゴール済みチームを除いて順位を付ける', () => {
     let g = makeGame(true);
-    g.settings.goalPosition = 3;
+    g.settings.goalPosition = 4;
     g.settings.finishPolicy = 'all-goal';
     g = revealChallenge(startGame(g));
     g = commitResults(g, g.teams.map((t) => t.id));

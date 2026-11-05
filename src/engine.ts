@@ -45,6 +45,7 @@ export function makePublicView(game: Game, stage: PublicStage, challenge?: Chall
       timeLimitSeconds: challenge.timeLimitSeconds,
     } : {}),
     ...(results ? { results: cloned(results) } : {}),
+    ...(stage === 'finished' ? { standingOrder: sortedStandings(game.teams, game.rounds).map((t) => t.id) } : {}),
   };
 }
 export function activeTeams(game: Game): Team[] {
@@ -122,7 +123,7 @@ export function commitResults(original: Game, orderedTeamIds: string[]): Game {
   const policy = game.settings.finishPolicy;
   if ((policy === 'first-goal' && anyGoal) || (policy === 'all-goal' && allGoal)) {
     game.status = 'finished';
-    game.publicView = makePublicView(game, 'finished');
+    game.publicView = makePublicView(game, 'finished', challenge, results);
   } else {
     game.publicView = makePublicView(game, 'result', challenge, results);
     game.publicView.roundNumber = roundNo;

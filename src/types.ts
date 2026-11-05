@@ -52,6 +52,7 @@ export interface PublicView {
   challengeDescription?: string;
   timeLimitSeconds?: number | null;
   results?: RoundResult[];
+  standingOrder?: string[];
 }
 export interface Game {
   id: string;

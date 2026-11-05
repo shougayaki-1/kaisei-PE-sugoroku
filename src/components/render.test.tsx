@@ -26,7 +26,7 @@ describe('主要画面のスモークテスト', () => {
   it('マス数が10の倍数でなくても盤面を描画できる', () => {
     const game = makeGame();
     const html = renderToString(<Board teams={game.teams} goal={17}/>);
-    expect(html).toContain('blank-');
+    expect(html).toContain('board-cell-placeholder');
     expect(html).toContain('GOAL');
   });
 });

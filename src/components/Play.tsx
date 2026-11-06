@@ -89,7 +89,7 @@ export function PlayScreen({ game, onEdit }: Props) {
                 action((g) => selectChallenge(g, next.id));
               }}><Shuffle size={17}/>ランダムで選び直す</button>
               <button className="btn btn-primary full-width btn-large" disabled={!challenge} onClick={() => action(revealChallenge)}><Eye size={18}/>このお題を公開する</button>
-            </> : <div className="empty-control"><ListChecks size={35}/><h3>すべてのお題を実施しました</h3><p>お題を最初からもう一巡するか、新しく追加できます。</p><button className="btn btn-primary" onClick={() => action(restartChallengeCycle, true)}><RotateCcw size={16}/>お題をもう一巡する</button><button className="btn btn-secondary" onClick={onEdit}><Plus size={16}/>お題を追加</button></div>}
+            </> : <div className="empty-control"><ListChecks size={35}/><h3>{game.challenges.length ? 'すべてのお題を実施しました' : 'お題がありません'}</h3><p>{game.challenges.length ? 'お題を最初からもう一巡するか、新しく追加できます。' : 'お題を追加してゲームを続けられます。'}</p>{game.challenges.length > 0 && <button className="btn btn-primary" onClick={() => action(restartChallengeCycle, true)}><RotateCcw size={16}/>お題をもう一巡する</button>}<button className="btn btn-secondary" onClick={onEdit}><Plus size={16}/>お題を追加</button></div>}
           </>}
           {game.phase === 'revealed' && <>
             <div className="step-label"><span>02</span> 順位を確定する</div>

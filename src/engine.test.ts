@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  makeGame, startGame, revealChallenge, commitResults, nextRound, adjustPosition, makeChallenge, sortedStandings,
+  makeGame, startGame, revealChallenge, commitResults, nextRound, restartChallengeCycle, adjustPosition, makeChallenge, sortedStandings,
 } from './engine';
 
 describe('すごろくの進行', () => {
@@ -61,6 +61,55 @@ describe('すごろくの進行', () => {
     g.settings.finishPolicy = 'all-goal';
     g = commitResults(revealChallenge(startGame(g)), g.teams.map((t) => t.id));
     expect(sortedStandings(g.teams, g.rounds)[0].id).toBe(g.teams[0].id);
+  });
+  it('全お題を実施すると自動的に最初から再利用でき、過去のラウンド履歴が残る', () => {
+    let g = makeGame(true);
+    g.settings.finishPolicy = 'manual';
+    const ids = g.challenges.map((c) => c.id);
+    g = startGame(g);
+    for (let i = 0; i < ids.length; i++) {
+      expect(g.selectedChallengeId).toBe(ids[i]);
+      g = commitResults(revealChallenge(g), g.teams.map((t) => t.id));
+      if (i < ids.length - 1) g = nextRound(g);
+    }
+    expect(g.challenges.every((c) => c.status === 'completed')).toBe(true);
+    const history = g.rounds.map((r) => r.challengeId);
+    g = nextRound(g);
+    expect(g.selectedChallengeId).toBe(ids[0]);
+    expect(g.challenges.every((c) => c.status === 'unused')).toBe(true);
+    expect(g.rounds.map((r) => r.challengeId)).toEqual(history);
+    g = commitResults(revealChallenge(g), g.teams.map((t) => t.id));
+    expect(g.rounds).toHaveLength(ids.length + 1);
+    expect(g.rounds.at(-1)?.roundNumber).toBe(ids.length + 1);
+    expect(g.challenges[0].status).toBe('completed');
+  });
+  it('ランダム出題も1巡するまで同じお題を出さず、2巡目へ進む', () => {
+    let g = makeGame(true);
+    g.settings.finishPolicy = 'manual';
+    g.settings.selectionMode = 'random';
+    g = startGame(g);
+    for (let cycle = 0; cycle < 2; cycle++) {
+      const seen = new Set<string>();
+      for (let i = 0; i < g.challenges.length; i++) {
+        const id = g.selectedChallengeId!;
+        expect(seen.has(id)).toBe(false);
+        seen.add(id);
+        g = commitResults(revealChallenge(g), g.teams.map((t) => t.id));
+        if (i < g.challenges.length - 1 || cycle === 0) g = nextRound(g);
+      }
+      expect(seen.size).toBe(g.challenges.length);
+    }
+    expect(g.rounds).toHaveLength(10);
+  });
+  it('旧データで全お題消化後に停止したゲームは手動で周回を再開できる', () => {
+    const g = makeGame(true);
+    g.status = 'playing';
+    g.phase = 'ready';
+    g.challenges.forEach((c) => { c.status = 'completed'; });
+    const restarted = restartChallengeCycle(g);
+    expect(restarted.challenges.every((c) => c.status === 'unused')).toBe(true);
+    expect(restarted.selectedChallengeId).toBe(restarted.challenges[0].id);
+    expect(() => restartChallengeCycle(restarted)).toThrow();
   });
   it('出題済みのお題は再抽選されない', () => {
     let g = makeGame(true);

@@ -130,10 +130,25 @@ export function commitResults(original: Game, orderedTeamIds: string[]): Game {
   }
   return game;
 }
+/** 全題を実施した後の新しい周回を開始する（古い保存データの復旧にも使用）。 */
+export function restartChallengeCycle(original: Game): Game {
+  if (original.status !== 'playing' || original.phase !== 'ready' ||
+      !original.challenges.length || unusedChallenges(original).length) {
+    throw new Error('未使用のお題が残っている間は再使用できません。');
+  }
+  const game = cloned(original);
+  game.challenges.forEach((c) => { c.status = 'unused'; });
+  game.selectedChallengeId = nextChallengeId(game);
+  return game;
+}
 export function nextRound(original: Game): Game {
   if (original.status !== 'playing' || original.phase !== 'result') throw new Error('次のラウンドには進めません。');
   const game = cloned(original);
   game.phase = 'ready';
+  // 使い切ったら自動で次の周回へ。確定済みのラウンド履歴は保持する。
+  if (game.challenges.length && !unusedChallenges(game).length) {
+    return restartChallengeCycle(game);
+  }
   game.selectedChallengeId = nextChallengeId(game);
   return game;
 }

@@ -124,7 +124,7 @@ export function SettingsScreen({ game, onPlay }: Props) {
 
       {tab === 'challenges' && <div className="challenge-layout">
         <section className="panel challenge-list-panel">
-          <div className="section-heading"><div><h2>お題リスト</h2><p>途中追加にも対応します。</p></div><span className="count-tag">{game.challenges.length} 件</span></div>
+          <div className="section-heading"><div><h2>お題リスト</h2><p>途中追加に対応。全お題を使い切ると、次のラウンドから自動で再利用します。</p></div><span className="count-tag">{game.challenges.length} 件</span></div>
           <div className="challenge-list">
             {challengeList.map((challenge, i) => <div key={challenge.id} className={'challenge-list-item ' + (selectedChallenge?.id === challenge.id ? 'chosen ' : '') + (challenge.status === 'completed' ? 'completed' : '')}>
               <button className="challenge-pick" onClick={() => setSelected(challenge.id)}>

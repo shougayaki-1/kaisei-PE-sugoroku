@@ -65,6 +65,7 @@ describe('すごろくの進行', () => {
   it('全お題を実施すると自動的に最初から再利用でき、過去のラウンド履歴が残る', () => {
     let g = makeGame(true);
     g.settings.finishPolicy = 'manual';
+    g.settings.goalPosition = 150;
     const ids = g.challenges.map((c) => c.id);
     g = startGame(g);
     for (let i = 0; i < ids.length; i++) {
@@ -86,6 +87,7 @@ describe('すごろくの進行', () => {
   it('ランダム出題も1巡するまで同じお題を出さず、2巡目へ進む', () => {
     let g = makeGame(true);
     g.settings.finishPolicy = 'manual';
+    g.settings.goalPosition = 150;
     g.settings.selectionMode = 'random';
     g = startGame(g);
     for (let cycle = 0; cycle < 2; cycle++) {
